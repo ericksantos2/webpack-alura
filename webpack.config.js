@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: './app/src/js/app.js',
@@ -10,16 +12,27 @@ module.exports = {
     clean: true,
   },
   module: {
-    rules: [{ test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] }],
+    rules: [
+      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './app/src/app.html',
-      filename: 'app.html',
+      template: './app/src/index.html',
+      filename: 'index.html',
       hash: true,
     }),
     new MiniCssExtractPlugin({
-      filename: 'style.css'
-    })
+      filename: 'style.css',
+    }),
+    new webpack.optimize.ModuleConcatenationPlugin()
   ],
+  optimization: {
+    minimize: true,
+    minimizer: [new CssMinimizerWebpackPlugin(), '...'],
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, 'dist'),
+    port: 3000
+  }
 };
